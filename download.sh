@@ -26,7 +26,8 @@ SPECIALS_DIR="$SHOW_DIR/Season 00"
 mkdir -p "$SEASON_DIR" "$SPECIALS_DIR"
 
 echo "Fetching playlist..."
-playlist_data=$(yt-dlp -j --flat-playlist "$PLAYLIST_URL")
+playlist_data=$(gum spin --spinner "line" --title "Getting videos..." -- \
+  yt-dlp -j --flat-playlist "$PLAYLIST_URL")
 
 mapfile -t playlist_entries < <(
   echo "$playlist_data" |
@@ -44,14 +45,12 @@ for entry in "${playlist_entries[@]}"; do
   fi
 done
 
-selected=$(printf '%s\n' "${playlist_entries[@]}" | gum choose --no-limit)
+selected=$(gum choose --no-limit "${playlist_entries[@]}")
 
 if [[ -z "$selected" ]]; then
   echo "No episodes selected."
   exit 0
 fi
-
-special_index=1
 
 echo "Downloading selected episodes..."
 
@@ -61,10 +60,9 @@ while IFS=$'\t' read -r index video_id title; do
   if [[ -n "$episode_num" ]]; then
     filename="$SEASON_DIR/S${SEASON_NUM}E$(printf "%02d" "$episode_num") - $title.%(ext)s"
   else
-    sp=$(printf "%02d" "$special_index")
-    filename="$SPECIALS_DIR/S00E$sp - $title.%(ext)s"
+    safe_title=$(echo "$title" | tr '/:*?"<>|' _)
+    filename="$SPECIALS_DIR/$safe_title.%(ext)s"
 
-    # Find the next real episode after this playlist index
     airs_before=""
     for ((i=index + 1; i <= ${#playlist_entries[@]}; i++)); do
       if [[ -n "${playlist_index_to_episode[$i]:-}" ]]; then
@@ -83,8 +81,6 @@ while IFS=$'\t' read -r index video_id title; do
   <airsbeforeepisode>${airs_before}</airsbeforeepisode>
 </episodedetails>
 EOF
-
-    special_index=$((special_index + 1))
   fi
 
   yt-dlp \
