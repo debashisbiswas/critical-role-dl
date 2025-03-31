@@ -25,7 +25,6 @@ SEASON_DIR="$SHOW_DIR/Season $SEASON_NUM"
 SPECIALS_DIR="$SHOW_DIR/Season 00"
 mkdir -p "$SEASON_DIR" "$SPECIALS_DIR"
 
-echo "Fetching playlist..."
 playlist_data=$(gum spin --spinner "line" --title "Getting videos..." -- \
   yt-dlp -j --flat-playlist "$PLAYLIST_URL")
 
@@ -58,7 +57,7 @@ while IFS=$'\t' read -r index video_id title; do
   episode_num=$(echo "$title" | grep -oP 'Episode \K\d+' || true)
 
   if [[ -n "$episode_num" ]]; then
-    filename="$SEASON_DIR/S${SEASON_NUM}E$(printf "%02d" "$episode_num") - $title.%(ext)s"
+    filename="$SEASON_DIR/$SHOW_NAME S${SEASON_NUM}E$(printf "%02d" "$episode_num").%(ext)s"
   else
     safe_title=$(echo "$title" | tr '/:*?"<>|' _)
     filename="$SPECIALS_DIR/$safe_title.%(ext)s"
