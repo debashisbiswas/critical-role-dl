@@ -2,9 +2,8 @@
 
 pkgs.mkShell {
   packages = [
-    (pkgs.python3.withPackages (ps: with ps; [
-      flask
-      yt-dlp
-    ]))
+    pkgs.python3Packages.yt-dlp
+    pkgs.jq
+    pkgs.gum
   ];
 }
