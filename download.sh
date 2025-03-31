@@ -23,7 +23,6 @@ done
 SHOW_DIR="$BASE_DIR/$SHOW_NAME"
 SEASON_DIR="$SHOW_DIR/Season $SEASON_NUM"
 SPECIALS_DIR="$SHOW_DIR/Season 00"
-mkdir -p "$SEASON_DIR" "$SPECIALS_DIR"
 
 playlist_data=$(gum spin --spinner "line" --title "Getting videos..." -- \
   yt-dlp -j --flat-playlist "$PLAYLIST_URL")
@@ -44,7 +43,7 @@ for entry in "${playlist_entries[@]}"; do
   fi
 done
 
-selected=$(gum choose --no-limit "${playlist_entries[@]}")
+selected=$(gum choose --no-limit "${playlist_entries[@]}" --header "Download episodes (to $BASE_DIR)")
 
 if [[ -z "$selected" ]]; then
   echo "No episodes selected."
@@ -52,6 +51,7 @@ if [[ -z "$selected" ]]; then
 fi
 
 echo "Downloading selected episodes..."
+mkdir -p "$SEASON_DIR" "$SPECIALS_DIR"
 
 while IFS=$'\t' read -r index video_id title; do
   episode_num=$(echo "$title" | grep -oP 'Episode \K\d+' || true)
