@@ -5,20 +5,12 @@ set -euo pipefail
 PLAYLIST_URL="https://www.youtube.com/playlist?list=PL1tiwbzkOjQxD0jjAE7PsWoaCrs0EkBH2"
 SHOW_NAME="Critical Role"
 SEASON_NUM="02"
-BASE_DIR="$(pwd)"
+if [[ $# -ne 1 ]]; then
+  echo "Usage: $0 <download-directory>"
+  exit 1
+fi
 
-while [[ $# -gt 0 ]]; do
-  case "$1" in
-    -d|--dir)
-      BASE_DIR="$2"
-      shift 2
-      ;;
-    *)
-      echo "Usage: $0 [-d|--dir <download-directory>]"
-      exit 1
-      ;;
-  esac
-done
+BASE_DIR="$1"
 
 SHOW_DIR="$BASE_DIR/$SHOW_NAME"
 SEASON_DIR="$SHOW_DIR/Season $SEASON_NUM"
